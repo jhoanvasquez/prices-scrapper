@@ -19,7 +19,7 @@ def run_scraper(script_name):
 
     activate_command = get_activate_command()
 
-    command = f"{activate_command} && python {script_path}"
+    command = f"bash -c '{activate_command} && python {script_path}'"
     print(f"Running {script_name}...")
 
     result = subprocess.run(command, shell=True, capture_output=True, text=True)

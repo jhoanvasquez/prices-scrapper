@@ -2,18 +2,24 @@ import os
 import subprocess
 import sys
 
-# Path to the virtual environment
-VENV_PATH = os.path.join(os.path.dirname(__file__), "venv", "Scripts", "activate")
+VENV_PATH = os.path.join(os.path.dirname(__file__), "venv")
 
-# Path to the scrapers folder
-SCRAPER_FOLDER = os.path.join(os.path.dirname(__file__))
+SCRAPER_FOLDER = os.path.dirname(__file__)
+
+def get_activate_command():
+    """Get the correct command to activate the virtual environment based on OS."""
+    if os.name == "nt":  # Windows
+        return os.path.join(VENV_PATH, "Scripts", "activate")
+    else:  # Unix/Linux/Mac
+        return f"source {os.path.join(VENV_PATH, 'bin', 'activate')}"
 
 def run_scraper(script_name):
     """Run a scraper script within the virtual environment."""
     script_path = os.path.join(SCRAPER_FOLDER, script_name)
 
-    # Command to activate the virtual environment and run the script
-    command = f"{VENV_PATH} && python {script_path}"
+    activate_command = get_activate_command()
+
+    command = f"{activate_command} && python {script_path}"
     print(f"Running {script_name}...")
 
     result = subprocess.run(command, shell=True, capture_output=True, text=True)
@@ -25,12 +31,10 @@ def run_scraper(script_name):
         print(result.stderr)
 
 def main():
-    # List of scraper scripts to run
     scrapers = [
         "scrape_olimpica.py"
     ]
 
-    # Run each scraper
     for scraper in scrapers:
         run_scraper(scraper)
 

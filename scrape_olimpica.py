@@ -1,10 +1,13 @@
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
+from datetime import datetime
 
-def scrape_olimpica_data(pages=1, output_file="olimpica_products.xlsx"):
+def scrape_olimpica_data(pages=1):
+    current_date = datetime.now().strftime("%Y-%m-%d")
+    output_file = f"olimpica_products_{current_date}.xlsx"
+
     base_url = "https://www.olimpica.com/supermercado/despensa/granos?page={}"
-
     scraped_data = []
 
     for page in range(1, pages + 1):
@@ -39,5 +42,7 @@ def scrape_olimpica_data(pages=1, output_file="olimpica_products.xlsx"):
     df = pd.DataFrame(scraped_data)
     df.to_excel(output_file, index=False)
     print(f"Data successfully saved to {output_file}")
+
+    return output_file
 
 scrape_olimpica_data(pages=4)

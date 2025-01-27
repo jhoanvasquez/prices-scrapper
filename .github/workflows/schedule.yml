@@ -22,9 +22,24 @@ jobs:
         run: |
           python -m venv venv
           source venv/bin/activate
+          python -m pip install --upgrade pip
           pip install -r requirements.txt
 
       - name: Run orchestrator
+        id: run-scraper
         run: |
           source venv/bin/activate
           python orchestrator.py
+        # Capture the dynamically generated file name
+        env:
+          OUTPUT_FILE: $(python -c "import datetime; print(f'olimpica_products_{datetime.datetime.now().strftime(\"%Y-%m-%d\")}.xlsx')")
+
+      - name: Configure AWS CLI
+        run: |
+          aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws configure set default.region us-east-1
+
+      - name: Upload to S3
+        run: |
+          aws s3 cp ${{ env.OUTPUT_FILE }} s3://files-scrape-products/
